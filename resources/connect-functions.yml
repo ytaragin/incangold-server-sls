@@ -1,0 +1,20 @@
+connect:
+  handler: handlers/conn.onConnect
+  events:
+    - websocket:
+        route: $connect
+disconnect:
+  handler: handlers/conn.onDisconnect
+  events:
+    - websocket:
+        route: $disconnect
+defaultMessages:
+  handler: handlers/conn.defaultMessage
+  events:
+    - websocket:
+        route: $default
+sendMessage:
+  handler: handlers/conn.sendMessage
+  events:
+    - websocket:
+        route: sendMessage

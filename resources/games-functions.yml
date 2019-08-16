@@ -1,0 +1,23 @@
+hello:
+  handler: handlers/handler.hello
+  memorySize: ${self:custom.defaultmemory}
+  events:
+    - http: ANY /hello
+games_get:
+  handler: handlers/games.get
+  memorySize: ${self:custom.defaultmemory}
+  xxrole: IncanGoldGamesRole
+  events:
+    - http: GET /games
+games_post:
+  handler: handlers/games.post
+  memorySize: ${self:custom.defaultmemory}
+  xxrole: IncanGoldGamesRole
+  events:
+    - http: POST /games
+games_delete:
+  handler: handlers/games.delete
+  memorySize: ${self:custom.defaultmemory}
+  xxrole: IncanGoldGamesRole
+  events:
+    - http: DELETE /games
