@@ -1,10 +1,14 @@
 const AWS = require('aws-sdk');
+const GM = require("../lib/game_manager");
+
 //const DDB = new AWS.DynamoDB({apiVersion: '2012-08-10'});
 //const DDBDOC = new AWS.DynamoDB.DocumentClient();
+AWS.config.update({ region: process.env.AWS_REGION });
 
 
 
-const GL = new GameList(process.env.GAMES_TABLE);
+//const GM = new GameList(process.env.GAMES_TABLE);
+const GL = new GM.GameManager({tableName:process.env.GAMES_TABLE, docClient:new AWS.DynamoDB.DocumentClient()})
 
 
 
@@ -26,35 +30,6 @@ function gameRecToDDB(rec) {
     }
 
     return dbRec;
-}
-
-exports.post = async (event, context) =>{
-
-    console.log("Post Called");
-    if (!event.body) {
-        return {
-            statusCode: 400,
-            error: `No Data`
-        };
-    }
-
-    console.log(`Post Body ${event.body}`);
-
-    let body = JSON.parse(event.body);
-    if (!body.name || body.name == "") {
-        return {
-            statusCode: 400,
-            error: `No Data`
-        };
-    }
-
-    console.log(`Parsed: ${body}`);
-
-
-    let retValue = await GL.createGame(body);
-
-    console.log(`Will return ${retValue}`);
-    return retValue;
 }
 
 
@@ -83,11 +58,5 @@ exports.get = async (event, context) => {
 };
 
 
-exports.delete = async (event, context) => {
-    return  {
-        statusCode: 200,
-        body: "Get A Bunch of Games"
-    }
-};
 
-exports.GameList = GameList;
+

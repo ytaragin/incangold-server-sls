@@ -6,13 +6,9 @@ Resources:
       AttributeDefinitions:
         - AttributeName: gameID
           AttributeType: S
-        - AttributeName: createTime
-          AttributeType: N
       KeySchema:
         - AttributeName: gameID
           KeyType: HASH
-        - AttributeName: createTime
-          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
@@ -23,9 +19,13 @@ Resources:
       AttributeDefinitions:
         - AttributeName: gameID
           AttributeType: S
+        - AttributeName: turnPerson
+          AttributeType: S
       KeySchema:
         - AttributeName: gameID
           KeyType: HASH
+        - AttributeName: turnPerson
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5

@@ -55,8 +55,9 @@ describe('A Game Flow', () => {
 
 
         let expectState = {
+            gameMove: 0,
             currentRound: 1,
-            currentMove: 0,
+            moveInRound: 0,
             treasureWaiting: 0,
             artifactsWaiting: 0,
             removedCards: [],
@@ -99,19 +100,21 @@ describe('A Game Flow', () => {
 
 
         expect(()=> {game.doNextMove()}).toThrow('Not all players have entered their move');
+        let curMove = 1;
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
         expect(game.isReadyForNextMove()).toBeFalsy();
 
-        game.setMove('Bill', true);
+        game.setMove(curMove, 'Bill', true);
 
         expect(game.isReadyForNextMove()).toBeTruthy();
 
 
         game.doNextMove();
 
-        expectState.currentMove = 1;
+        expectState.moveInRound = 1;
+        expectState.gameMove = curMove;
         expectState.treasureWaiting = 1;
         expectState.cardsLeftInDeck = 8;
         expectState.lastCardPlayed = deck.shift();
@@ -125,13 +128,15 @@ describe('A Game Flow', () => {
 
         expect(()=> {game.doNextMove()}).toThrow('Not all players have entered their move');
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
-        game.setMove('Bill', true);
+        curMove += 1;
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
+        game.setMove(curMove, 'Bill', true);
 
         game.doNextMove();
 
-        expectState.currentMove+=1;
+        expectState.moveInRound+=1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck-=1;
         expectState.lastCardPlayed = deck.shift();
         expectState.activePlayers = [
@@ -145,29 +150,35 @@ describe('A Game Flow', () => {
 
         expect(()=> {game.doNextMove()}).toThrow('Not all players have entered their move');
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
-        game.setMove('Bill', true);
+        curMove += 1;
+
+        expect(()=> {game.setMove(curMove+1, 'John', true)}).toThrow(`${curMove+1} is not the current move`);
+        expect(()=> {game.setMove(curMove-1, 'John', true)}).toThrow(`${curMove-1} is not the current move`);
+
+
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
+        game.setMove(curMove, 'Bill', true);
 
         game.doNextMove();
 
-        expectState.currentMove += 1;
+        expectState.moveInRound += 1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck -= 1;
         expectState.whichHazardsPlayed.Spider = 1;
         expectState.lastCardPlayed = deck.shift();
 
-
-
         expect(game.getPublicGameState()).toEqual(expectState);
 
+        curMove += 1;
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
-        game.setMove('Bill', false);
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
+        game.setMove(curMove, 'Bill', false);
         game.doNextMove();
 
-
-        expectState.currentMove += 1;
+        expectState.moveInRound += 1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck -= 1;
         expectState.treasureWaiting = 1;
         expectState.lastCardPlayed = deck.shift();
@@ -189,13 +200,15 @@ describe('A Game Flow', () => {
         });
 
 
+        curMove += 1;
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
         game.doNextMove();
 
 
-        expectState.currentMove += 1;
+        expectState.moveInRound += 1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck -= 1;
         expectState.treasureWaiting = 1;
         expectState.artifactsWaiting = 1;
@@ -210,24 +223,28 @@ describe('A Game Flow', () => {
         expect(game.getPublicGameState()).toEqual(expectState);
 
 
+        curMove += 1;
 
-        game.setMove('John', true);
-        game.setMove('Dave', true);
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', true);
         game.doNextMove();
 
-        expectState.currentMove += 1;
+        expectState.moveInRound += 1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck -= 1;
         expectState.whichHazardsPlayed.Fire = 1;
         expectState.lastCardPlayed = deck.shift();
 
         expect(game.getPublicGameState()).toEqual(expectState);
 
+        curMove += 1;
 
-        game.setMove('John', true);
-        game.setMove('Dave', false);
+        game.setMove(curMove, 'John', true);
+        game.setMove(curMove, 'Dave', false);
         game.doNextMove();
 
-        expectState.currentMove += 1;
+        expectState.moveInRound += 1;
+        expectState.gameMove = curMove;
         expectState.cardsLeftInDeck -= 1;
         expectState.activePlayers = [];
         expectState.artifactsWaiting = 0;
@@ -264,7 +281,8 @@ describe('A Game Flow', () => {
         let remDeck = expectState.removedCards;
         expectState = {
             currentRound: 2,
-            currentMove: 0,
+            moveInRound: 0,
+            gameMove: curMove,
             treasureWaiting: 0,
             artifactsWaiting: 0,
             removedCards: remDeck,

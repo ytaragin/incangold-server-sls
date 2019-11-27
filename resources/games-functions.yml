@@ -9,15 +9,51 @@ games_get:
   xxrole: IncanGoldGamesRole
   events:
     - http: GET /games
-games_post:
-  handler: handlers/games.post
+
+game_delete:
+  handler: handlers/game.delete
   memorySize: ${self:custom.defaultmemory}
   xxrole: IncanGoldGamesRole
   events:
-    - http: POST /games
-games_delete:
-  handler: handlers/games.delete
+    - http:
+        path: game/{id}
+        method: delete
+        request:
+          parameters:
+            paths:
+              id: true
+
+game_post:
+  handler: handlers/game.post
   memorySize: ${self:custom.defaultmemory}
   xxrole: IncanGoldGamesRole
   events:
-    - http: DELETE /games
+    - http: POST /game
+
+game_get:
+  handler: handlers/game.get
+  memorySize: ${self:custom.defaultmemory}
+  events:
+    - http:
+        path: game/{id}
+        method: get
+        request:
+          parameters:
+            paths:
+              id: true
+
+
+move_post:
+  handler: handlers/move.post
+  memorySize: ${self:custom.defaultmemory}
+  events:
+    - http:
+        path: turn/{turnid}/player/{playerid}/gacd ..me/{gameid}
+        method: post
+        request:
+          parameters:
+            paths:
+              gameid: true
+              turnid: true
+              playerid: true
+

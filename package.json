@@ -15,6 +15,24 @@
   },
   "jest": {
     "verbose": true,
-    "testMatch": [ "**/__tests__/**/*.test.js"]
-  }
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ]
+  },
+  "description": "Server For Incan Gold Like Game",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ytaragin/incangold-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ytaragin/incangold-server/issues"
+  },
+  "homepage": "https://github.com/ytaragin/incangold-server#readme"
 }
