@@ -8,34 +8,11 @@ AWS.config.update({
     endpoint: "http://localhost:8000"
 });
 
-const TABLENAME = "movesTable";
-
-const movesCreateParams = {
-    TableName : TABLENAME,
-    KeySchema: [
-        { AttributeName: "gameID", KeyType: "HASH"},  //Partition key
-        { AttributeName: "turnPerson", KeyType: "RANGE"},  //Partition key
-    ],
-    AttributeDefinitions: [
-        { AttributeName: "gameID", AttributeType: "S" },
-        { AttributeName: "turnPerson", AttributeType: "S" }
-    ],
-    ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1
-    }
-};
-
-const movesDeleteParams = {
-    TableName : TABLENAME
-};
-
-
 
 beforeEach(async () => {
     console.log("Setting Up DB");
-    await DBUtils.deleteTable(AWS, movesDeleteParams);
-    await DBUtils.createTable(AWS, movesCreateParams);
+    await DBUtils.deleteTable(AWS, DBUtils.movesDeleteParams);
+    await DBUtils.createTable(AWS, DBUtils.movesCreateParams);
 
     //do something
 });
@@ -43,7 +20,7 @@ beforeEach(async () => {
 test('StoreMoves', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let movesMgr = new MM.MovesManager({tableName:TABLENAME, docClient:docClient} );
+    let movesMgr = new MM.MovesManager({tableName:DBUtils.MOVESTABLENAME, docClient:docClient} );
 
     let gameID = "game123";
     let turnID = 12;

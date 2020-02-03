@@ -9,32 +9,10 @@ AWS.config.update({
     endpoint: "http://localhost:8000"
 });
 
-const TABLENAME = "gamesTable";
-
-const gameCreateParams = {
-    TableName : TABLENAME,
-    KeySchema: [
-        { AttributeName: "gameID", KeyType: "HASH"}  //Partition key
-    ],
-    AttributeDefinitions: [
-        { AttributeName: "gameID", AttributeType: "S" }
-    ],
-    ProvisionedThroughput: {
-        ReadCapacityUnits: 1,
-        WriteCapacityUnits: 1
-    }
-};
-
-const gameDeleteParams = {
-    TableName : TABLENAME
-};
-
-
-
 beforeEach(async () => {
     console.log("Setting Up DB");
-    await DBUtils.deleteTable(AWS, gameDeleteParams);
-    await DBUtils.createTable(AWS, gameCreateParams);
+    await DBUtils.deleteTable(AWS, DBUtils.gameDeleteParams);
+    await DBUtils.createTable(AWS, DBUtils.gameCreateParams);
 
     //do something
 });
@@ -42,27 +20,34 @@ beforeEach(async () => {
 test('Get Empty Game List', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let gameManager = new GM.GameManager({tableName:TABLENAME, docClient:docClient} );
+    let gameManager = new GM.GameManager({tableName:DBUtils.GAMESTABLENAME, docClient:docClient} );
 
     let val = await gameManager.getGameListBrief();
-    expect(val.Items).toEqual([]);
+    expect(val).toEqual([]);
 });
 
 
 test('Create and Get Game List', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let gameManager = new GM.GameManager({tableName:TABLENAME, docClient:docClient} );
+    let gameManager = new GM.GameManager({tableName:DBUtils.GAMESTABLENAME, docClient:docClient} );
 
-    let id1 = await gameManager.createGame();
-    let id2 = await gameManager.createGame();
+    let ids = [];
+    ids.push(await gameManager.createGame());
+    ids.push( await gameManager.createGame());
 
     let val = await gameManager.getGameListBrief();
-    expect(val.Count).toEqual(2);
-    expect(val.Items[0].gameID).toEqual(id2.fullID);
-    expect(val.Items[0].gameStatus).toEqual("CREATED");
-    expect(val.Items[1].gameID).toEqual(id1.fullID);
-    expect(val.Items[1].gameStatus).toEqual("CREATED");
+
+    val = val.sort((a, b) => (a.gameID > b.gameID) ? 1 : -1)
+    ids = ids.sort((a, b) => (a.fullID > b.fullID) ? 1 : -1)
+
+
+
+    expect(val.length).toEqual(2);
+    expect(val[0].gameID).toEqual(ids[0].fullID);
+    expect(val[0].gameStatus).toEqual("CREATED");
+    expect(val[1].gameID).toEqual(ids[1].fullID);
+    expect(val[1].gameStatus).toEqual("CREATED");
 });
 
 
@@ -70,7 +55,7 @@ test('Create and Get Game List', async () => {
 test('Create Game', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let gameManager = new GM.GameManager({tableName:TABLENAME, docClient:docClient} );
+    let gameManager = new GM.GameManager({tableName:DBUtils.GAMESTABLENAME, docClient:docClient} );
 
 
    let ids = await gameManager.createGame();
@@ -88,7 +73,7 @@ test('Create Game', async () => {
 test('Update Game', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let gameManager = new GM.GameManager({tableName:TABLENAME, docClient:docClient} );
+    let gameManager = new GM.GameManager({tableName:DBUtils.GAMESTABLENAME, docClient:docClient} );
 
 
     let ids = await gameManager.createGame();
@@ -116,12 +101,41 @@ test('Update Game', async () => {
 });
 
 
-test('Update Game', async () => {
+test('Unknown Game', async () => {
     let docClient = new AWS.DynamoDB.DocumentClient();
 
-    let gameManager = new GM.GameManager({tableName: TABLENAME, docClient: docClient});
+    let gameManager = new GM.GameManager({tableName: DBUtils.GAMESTABLENAME, docClient: docClient});
 
     let game = await gameManager.getGameInstance("NO_ID");
     expect(game).toBeFalsy();
+
+});
+
+test('Register Player', async () => {
+    let docClient = new AWS.DynamoDB.DocumentClient();
+
+    let gameManager = new GM.GameManager({tableName: DBUtils.GAMESTABLENAME, docClient: docClient});
+
+
+    let ids = await gameManager.createGame();
+    expect(ids).not.toBe(null);
+
+    let res = await gameManager.registerPlayerInGame(ids.fullID, "Joe");
+    expect(res).toBeTruthy();
+    res = await gameManager.registerPlayerInGame(ids.fullID, "Bill");
+    expect(res).toBeTruthy();
+
+    let testGame = new GAME.GameInstance();
+
+    testGame.addPlayer("Joe");
+    testGame.addPlayer("Bill");
+    // testGame.beginRound();
+
+
+
+    let game = await gameManager.getGameInstance(ids.fullID);
+
+    expect(game.state.players).toEqual(testGame.state.players);
+
 
 });

@@ -1,5 +1,46 @@
 
+const GAMESTABLENAME = "gamesTable";
+const MOVESTABLENAME = "movesTable";
 
+const gameCreateParams = {
+    TableName : GAMESTABLENAME,
+    KeySchema: [
+        { AttributeName: "gameID", KeyType: "HASH"}  //Partition key
+    ],
+    AttributeDefinitions: [
+        { AttributeName: "gameID", AttributeType: "S" }
+    ],
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1
+    }
+};
+
+const gameDeleteParams = {
+    TableName : GAMESTABLENAME
+};
+
+
+
+const movesCreateParams = {
+    TableName : MOVESTABLENAME,
+    KeySchema: [
+        { AttributeName: "gameID", KeyType: "HASH"},  //Partition key
+        { AttributeName: "turnPerson", KeyType: "RANGE"},  //Partition key
+    ],
+    AttributeDefinitions: [
+        { AttributeName: "gameID", AttributeType: "S" },
+        { AttributeName: "turnPerson", AttributeType: "S" }
+    ],
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1
+    }
+};
+
+const movesDeleteParams = {
+    TableName : MOVESTABLENAME
+};
 
 async function createTable(myAWS, params) {
 
@@ -35,6 +76,12 @@ async function deleteTable(myAWS, params) {
 
 module.exports ={
     deleteTable,
-    createTable
+    createTable,
+    MOVESTABLENAME,
+    GAMESTABLENAME,
+    gameCreateParams,
+    gameDeleteParams,
+    movesCreateParams,
+    movesDeleteParams
 };
 

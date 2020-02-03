@@ -48,7 +48,7 @@ move_post:
   memorySize: ${self:custom.defaultmemory}
   events:
     - http:
-        path: turn/{turnid}/player/{playerid}/gacd ..me/{gameid}
+        path: turn/{turnid}/player/{playerid}/game/{gameid}
         method: post
         request:
           parameters:

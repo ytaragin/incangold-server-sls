@@ -77,7 +77,7 @@ exports.get = async (event, context) => {
 exports.delete = async (event, context) => {
     return  {
         statusCode: 200,
-        body: "Get A Bunch of Games"
+        body: "Delete A Games"
     }
 };
 
